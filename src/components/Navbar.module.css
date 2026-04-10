@@ -1,0 +1,200 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1.4rem;
+  background: rgba(15, 20, 36, 0.78);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(18px);
+  overflow: visible;
+}
+
+:global(:root[data-theme='light']) .navbar {
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 6px 22px rgba(15, 23, 42, 0.08);
+}
+
+.menuButton {
+  display: none;
+}
+
+.navigation {
+  display: flex;
+  gap: 1rem;
+  min-width: 0;
+  align-items: center;
+}
+
+.navigation a {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  padding: 0.5rem 0.55rem;
+  border-radius: 999px;
+}
+
+.navigation a:hover,
+.navigation a.active {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  justify-self: end;
+}
+
+.themeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.themeButton svg {
+  font-size: 1rem;
+}
+
+.themeButton:hover {
+  transform: translateY(-1px);
+  background: var(--accent-soft);
+}
+
+:global(:root[data-theme='light']) .themeButton {
+  background: rgba(79, 70, 229, 0.1);
+}
+
+.langSelect {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.55rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+:global(:root[data-theme='light']) .langSelect {
+  background: rgba(15, 23, 42, 0.04);
+  color: #1f2937;
+}
+
+.themeButton:focus-visible,
+.langSelect:focus-visible,
+.menuButton:focus-visible,
+.navigation a:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--accent) 70%, #fff 30%);
+  outline-offset: 2px;
+}
+
+@media (max-width: 760px) {
+  .navbar {
+    grid-template-columns: auto 1fr;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .menuButton {
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  :global(:root[data-theme='light']) .menuButton {
+    background: rgba(15, 23, 42, 0.04);
+    color: #1f2937;
+  }
+
+  .navigation {
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    left: 0.75rem;
+    right: 0.75rem;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 0.45rem;
+    background: rgba(8, 12, 24, 0.68);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+    transform-origin: top center;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.22s ease,
+      transform 0.22s ease,
+      visibility 0.22s step-end;
+  }
+
+  :global(:root[data-theme='light']) .navigation {
+    background: rgba(255, 255, 255, 0.86);
+  }
+
+  .navigationOpen {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      opacity 0.24s ease,
+      transform 0.24s ease,
+      visibility 0s;
+  }
+
+  .navigation a {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border-radius: 11px;
+  }
+
+  .actions {
+    justify-self: end;
+    gap: 0.5rem;
+  }
+
+  .langSelect {
+    padding: 0.5rem 0.65rem;
+    font-size: 0.94rem;
+  }
+
+  .themeButton,
+  .menuButton {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .navbar {
+    padding: 0.65rem 0.75rem;
+  }
+
+  .navigation {
+    left: 0.55rem;
+    right: 0.55rem;
+  }
+
+  .langSelect {
+    max-width: 8.5rem;
+  }
+}

@@ -1,0 +1,259 @@
+.beatmaker {
+  position: relative;
+  margin: 0 auto;
+  width: min(1120px, 100%);
+  padding: clamp(1.2rem, 2.6vw, 2rem);
+  border-radius: 34px;
+  border: 1px solid var(--border);
+  background: linear-gradient(145deg, rgba(18, 23, 42, 0.92), rgba(8, 10, 22, 0.92));
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+:global(:root[data-theme='light']) .beatmaker {
+  background: linear-gradient(145deg, rgba(248, 250, 252, 0.94), rgba(237, 242, 255, 0.95));
+}
+
+.beatmaker::before,
+.beatmaker::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(42px);
+  pointer-events: none;
+}
+
+.beatmaker::before {
+  width: 260px;
+  height: 260px;
+  top: -90px;
+  right: -20px;
+  background: rgba(124, 92, 255, 0.26);
+}
+
+.beatmaker::after {
+  width: 220px;
+  height: 220px;
+  left: -60px;
+  bottom: -90px;
+  background: rgba(56, 189, 248, 0.2);
+}
+
+.header {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 1.25rem;
+}
+
+.badge {
+  display: inline-flex;
+  margin-bottom: 0.55rem;
+  padding: 0.3rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid rgba(124, 92, 255, 0.45);
+  color: var(--accent);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: clamp(1.55rem, 3vw, 2.4rem);
+  line-height: 1.1;
+}
+
+.header p {
+  margin: 0.6rem 0 0;
+  max-width: 58ch;
+  color: var(--text-muted);
+}
+
+.board {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.72rem;
+}
+
+.trackRow {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  align-items: center;
+  gap: 0.82rem;
+}
+
+.trackLabelWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.trackDot {
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 50%;
+  background: rgb(var(--step-rgb));
+  box-shadow: 0 0 0 4px rgba(var(--step-rgb), 0.18);
+}
+
+.trackLabel {
+  letter-spacing: 0.02em;
+}
+
+.stepGrid {
+  display: grid;
+  grid-template-columns: repeat(16, minmax(34px, 1fr));
+  gap: 0.42rem;
+}
+
+.stepButton {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+  border-radius: 11px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+:global(:root[data-theme='light']) .stepButton {
+  color: rgba(15, 23, 42, 0.5);
+  background: rgba(248, 250, 252, 0.95);
+}
+
+.stepButtonOn {
+  border-color: rgba(var(--step-rgb), 0.75);
+  background: linear-gradient(180deg, rgba(var(--step-rgb), 0.92), rgba(var(--step-rgb), 0.42));
+  color: #f8fbff;
+  box-shadow: 0 10px 16px rgba(var(--step-rgb), 0.23);
+}
+
+.stepButtonCurrent {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.5), 0 0 0 1px rgba(var(--step-rgb), 0.25);
+}
+
+.stepButton:hover {
+  transform: translateY(-1px);
+}
+
+.stepNumber {
+  font-size: 0.58rem;
+  font-weight: 700;
+}
+
+.controls {
+  position: relative;
+  z-index: 1;
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.playButton,
+.utilityButton {
+  border-radius: 999px;
+  padding: 0.62rem 1rem;
+  font-weight: 700;
+}
+
+.playButton {
+  background: linear-gradient(135deg, var(--accent), #3b82f6);
+  color: #fff;
+}
+
+.utilityButton {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.playButton:hover,
+.utilityButton:hover {
+  transform: translateY(-2px);
+}
+
+.bpmControl {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.bpmSlider {
+  width: min(240px, 54vw);
+  accent-color: var(--accent);
+}
+
+.bpmControl output {
+  min-width: 3ch;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  position: relative;
+  z-index: 1;
+  margin: 0.9rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.94rem;
+}
+
+.unlockMessage {
+  position: relative;
+  z-index: 1;
+  margin: 0.85rem 0 0;
+  color: #fbbf24;
+  font-weight: 700;
+}
+
+:global(:root[data-theme='light']) .unlockMessage {
+  color: #b45309;
+}
+
+@media (max-width: 920px) {
+  .trackRow {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+
+  .stepGrid {
+    grid-template-columns: repeat(16, minmax(30px, 1fr));
+  }
+
+  .bpmControl {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 640px) {
+  .beatmaker {
+    border-radius: 26px;
+  }
+
+  .controls {
+    gap: 0.55rem;
+  }
+
+  .playButton,
+  .utilityButton {
+    flex: 1 1 140px;
+    text-align: center;
+  }
+
+  .stepGrid {
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+  }
+}

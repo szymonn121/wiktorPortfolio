@@ -1,0 +1,270 @@
+.home {
+  padding: 2rem 1.5rem 1.5rem;
+  display: grid;
+  gap: 1.45rem;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.4rem;
+  align-items: stretch;
+  min-height: min(58vh, 560px);
+}
+
+.beatmakerSection {
+  margin-top: 0.4rem;
+  padding-bottom: 1.2rem;
+}
+
+.heroText {
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: clamp(0.45rem, 2.4vw, 2rem);
+}
+
+.overline {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+}
+
+.heroText h1 {
+  margin: 0;
+  font-size: clamp(2.9rem, 4vw, 4.8rem);
+  line-height: 1.02;
+}
+
+.roleCarousel {
+  margin-top: 1rem;
+  min-height: 82px;
+  border-radius: 22px;
+  background: transparent;
+  padding: 0.95rem 1.1rem;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.roleCurrent {
+  display: inline-block;
+  font-size: clamp(1.2rem, 2.5vw, 1.88rem);
+  line-height: 1.1;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.roleIndicators {
+  margin-top: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.roleDotSlot {
+  width: 1.48rem;
+  height: 0.62rem;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.roleDot {
+  width: 0.48rem;
+  height: 0.48rem;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.45);
+  position: relative;
+  z-index: 1;
+}
+
+.roleDotActive {
+  position: absolute;
+  inset: 0.02rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(124, 92, 255, 0.95), rgba(59, 130, 246, 0.95));
+  box-shadow: 0 8px 18px rgba(59, 130, 246, 0.24);
+}
+
+.ctaGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.ctaButton,
+.ctaButtonAlt {
+  padding: 0.75rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 700;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.ctaButton {
+  background: linear-gradient(135deg, var(--accent), #3b82f6);
+  color: #fff;
+}
+
+.ctaButtonAlt {
+  background: linear-gradient(135deg, var(--accent), #3b82f6);
+  color: #fff;
+  border: 0;
+}
+
+.ctaButton:hover,
+.ctaButtonAlt:hover {
+  transform: translateY(-2px);
+}
+
+.heroVisual {
+  display: none;
+}
+
+.glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 32px;
+  background: radial-gradient(circle at top, rgba(124, 92, 255, 0.2), transparent 48%);
+  filter: blur(48px);
+  z-index: 0;
+}
+
+.heroCard {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  padding: 1.6rem;
+  background: var(--surface);
+  border-radius: 32px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  z-index: 1;
+  display: grid;
+  gap: 1rem;
+}
+
+.heroCardRole {
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: clamp(1rem, 2.2vw, 1.4rem);
+  line-height: 1.2;
+  padding: 0.9rem 1rem;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.metrics div {
+  padding: 0.9rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.metrics strong {
+  display: block;
+  font-size: 1.5rem;
+  color: var(--accent);
+}
+
+.metrics span {
+  color: var(--text-muted);
+}
+
+.quickLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.quickLink {
+  padding: 0.62rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.04);
+  font-weight: 700;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.quickLink:hover {
+  transform: translateY(-2px);
+  background: rgba(124, 92, 255, 0.16);
+}
+
+@media (max-width: 940px) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .heroText {
+    margin-left: 0;
+  }
+
+  .heroVisual {
+    padding-top: 0;
+  }
+
+  .heroCard {
+    max-width: 680px;
+  }
+}
+
+@media (max-width: 680px) {
+  .home {
+    padding: 1.7rem 1rem 1.2rem;
+  }
+
+  .hero {
+    min-height: auto;
+  }
+
+  .heroText h1 {
+    font-size: clamp(2.2rem, 10vw, 3.1rem);
+  }
+
+  .roleCarousel {
+    min-height: 72px;
+    padding: 0.8rem 0.7rem;
+  }
+
+  .roleCurrent {
+    font-size: clamp(1.08rem, 5.5vw, 1.44rem);
+  }
+
+  .ctaGroup {
+    width: 100%;
+    gap: 0.6rem;
+  }
+
+  .ctaButton,
+  .ctaButtonAlt {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metrics div:last-child {
+    grid-column: 1 / -1;
+  }
+}

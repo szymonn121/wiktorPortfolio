@@ -1,0 +1,99 @@
+.about {
+  padding: 3rem 2rem 2rem;
+}
+
+.sectionLabel {
+  color: var(--accent);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  margin-bottom: 0.9rem;
+}
+
+.intro {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 920px;
+}
+
+.intro h2 {
+  margin: 0 0 1.2rem;
+  font-size: 2.8rem;
+}
+
+.intro p {
+  margin: 0 0 1rem;
+  color: var(--text-muted);
+  max-width: 680px;
+}
+
+.skillsSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+.card {
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+}
+
+.card h3 {
+  margin-top: 0;
+  color: var(--accent);
+}
+
+.card p {
+  color: var(--text-muted);
+  margin-top: 1rem;
+}
+
+.skillsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.3rem;
+}
+
+.skill {
+  padding: 0.85rem 1rem;
+  border-radius: 999px;
+  background: rgba(124, 92, 255, 0.1);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .about {
+    padding: 1.85rem 1rem 1.2rem;
+  }
+
+  .intro h2 {
+    font-size: clamp(2rem, 9vw, 2.4rem);
+    margin-bottom: 0.85rem;
+  }
+
+  .card {
+    padding: 1.25rem;
+    border-radius: 20px;
+  }
+
+  .skillsSection {
+    grid-template-columns: 1fr;
+    margin-top: 1.5rem;
+    gap: 1rem;
+  }
+
+  .skillsGrid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .skill {
+    text-align: center;
+  }
+}
