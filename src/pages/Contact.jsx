@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaGithub, FaYoutube, FaInstagram } from 'react-icons/fa';
 import styles from './Contact.module.css';
 
 function Contact({ texts }) {
@@ -54,14 +53,6 @@ function Contact({ texts }) {
           {sent && <p className={styles.sent}>{texts.contact.notification}</p>}
           <button type="submit" className={styles.submitButton}>{texts.contact.form.submit}</button>
         </form>
-        <div className={styles.socialCard}>
-          <h3>{texts.contact.social}</h3>
-          <div className={styles.socialLinks}>
-            <a href="https://github.com" target="_blank" rel="noreferrer"><FaGithub /> GitHub</a>
-            <a href="https://youtube.com" target="_blank" rel="noreferrer"><FaYoutube /> YouTube</a>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer"><FaInstagram /> Instagram</a>
-          </div>
-        </div>
       </div>
     </motion.main>
   );

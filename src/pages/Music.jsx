@@ -110,8 +110,10 @@ function Music({ texts }) {
     };
 
     let animationFrameId = null;
+    let autoScrollFrameId = null;
     let currentScroll = slider.scrollLeft;
     let targetScroll = slider.scrollLeft;
+    let autoPaused = false;
 
     const middleIndex = groupSize * Math.floor(LOOP_COPIES / 2) + Math.floor(groupSize / 2);
     const middleCard = cards[middleIndex];
@@ -187,16 +189,45 @@ function Music({ texts }) {
       }
     };
 
+    const pauseAutoScroll = () => {
+      autoPaused = true;
+    };
+
+    const resumeAutoScroll = () => {
+      autoPaused = false;
+    };
+
+    const animateAutoScroll = () => {
+      if (!autoPaused) {
+        targetScroll += 0.28;
+        if (!animationFrameId) {
+          animationFrameId = requestAnimationFrame(animateWheelScroll);
+        }
+      }
+
+      autoScrollFrameId = requestAnimationFrame(animateAutoScroll);
+    };
+
     findCenteredCard();
     slider.addEventListener('scroll', handleScroll, { passive: true });
     slider.addEventListener('wheel', handleWheel, { passive: false });
+    slider.addEventListener('mouseenter', pauseAutoScroll);
+    slider.addEventListener('mouseleave', resumeAutoScroll);
+    slider.addEventListener('touchstart', pauseAutoScroll, { passive: true });
+    slider.addEventListener('touchend', resumeAutoScroll, { passive: true });
     window.addEventListener('resize', handleScroll);
+    autoScrollFrameId = requestAnimationFrame(animateAutoScroll);
 
     return () => {
       slider.removeEventListener('scroll', handleScroll);
       slider.removeEventListener('wheel', handleWheel);
+      slider.removeEventListener('mouseenter', pauseAutoScroll);
+      slider.removeEventListener('mouseleave', resumeAutoScroll);
+      slider.removeEventListener('touchstart', pauseAutoScroll);
+      slider.removeEventListener('touchend', resumeAutoScroll);
       window.removeEventListener('resize', handleScroll);
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      if (autoScrollFrameId) cancelAnimationFrame(autoScrollFrameId);
     };
   }, [baseVideos, renderedVideos, styles.verticalCard]);
 
@@ -242,7 +273,6 @@ function Music({ texts }) {
                     <span>TikTok</span>
                   </div>
                 )}
-                <div className={styles.cardLabel}>{video.title}</div>
               </motion.a>
             );
           })}
