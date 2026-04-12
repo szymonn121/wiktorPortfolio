@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar.jsx';
 import Footer from './components/Footer.jsx';
 import Home from './pages/Home.jsx';
@@ -19,8 +19,12 @@ function App() {
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     const savedLang = localStorage.getItem('lang');
-    if (savedTheme) setIsDark(savedTheme === 'dark');
-    if (savedLang) setLang(savedLang);
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+      setIsDark(savedTheme === 'dark');
+    }
+    if (savedLang && content[savedLang]) {
+      setLang(savedLang);
+    }
   }, []);
 
   useEffect(() => {
@@ -33,7 +37,7 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [location.pathname]);
 
-  const texts = useMemo(() => content[lang], [lang]);
+  const texts = useMemo(() => content[lang] ?? content.pl, [lang]);
 
   return (
     <div className={styles.app}>
@@ -45,6 +49,7 @@ function App() {
           <Route path="/projects" element={<Projects texts={texts} />} />
           <Route path="/music" element={<Music texts={texts} />} />
           <Route path="/contact" element={<Contact texts={texts} />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AnimatePresence>
       <Footer />

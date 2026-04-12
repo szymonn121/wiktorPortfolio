@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { SiTiktok } from 'react-icons/si';
 import styles from './Music.module.css';
 
-const LOOP_COPIES = 5;
+const AUTO_SCROLL_INTERVAL = 5200;
+const AUTO_RESUME_DELAY = 2800;
 
 const instagramImages = {
   DVrOg9kjuFu: '/assets/images/change.png',
@@ -18,28 +19,88 @@ const youtubeImages = {
   'O09qlpH-ooU': 'https://img.youtube.com/vi/O09qlpH-ooU/hqdefault.jpg',
 };
 
+function wrapIndex(index, length) {
+  if (!length) return 0;
+  return ((index % length) + length) % length;
+}
+
 function Music({ texts }) {
   const sliderRef = useRef(null);
-  const isAdjustingRef = useRef(false);
-  const [activeRenderIndex, setActiveRenderIndex] = useState(0);
+  const autoIntervalRef = useRef(null);
+  const resumeTimeoutRef = useRef(null);
+  const scrollTimeoutRef = useRef(null);
+  const activeIndexRef = useRef(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [tiktokThumbnails, setTiktokThumbnails] = useState({});
-  const baseVideos = texts.music.videos;
+  const videos = texts.music.videos ?? [];
 
-  const renderedVideos = useMemo(() => Array.from({ length: LOOP_COPIES }, () => baseVideos).flat(), [baseVideos]);
+  useEffect(() => {
+    activeIndexRef.current = activeIndex;
+  }, [activeIndex]);
+
+  const alignToIndex = useCallback(
+    (index, behavior = 'smooth') => {
+      const slider = sliderRef.current;
+      if (!slider || videos.length === 0) return;
+
+      const normalized = wrapIndex(index, videos.length);
+      const cards = slider.querySelectorAll(`.${styles.verticalCard}`);
+      const targetCard = cards[normalized];
+      if (!targetCard) return;
+
+      const targetLeft = targetCard.offsetLeft - (slider.clientWidth - targetCard.clientWidth) / 2;
+      slider.scrollTo({ left: Math.max(0, targetLeft), behavior });
+
+      activeIndexRef.current = normalized;
+      setActiveIndex(normalized);
+    },
+    [styles.verticalCard, videos.length]
+  );
+
+  const stopAutoScroll = useCallback(() => {
+    if (autoIntervalRef.current) {
+      window.clearInterval(autoIntervalRef.current);
+      autoIntervalRef.current = null;
+    }
+  }, []);
+
+  const startAutoScroll = useCallback(() => {
+    stopAutoScroll();
+    if (videos.length <= 1) return;
+
+    autoIntervalRef.current = window.setInterval(() => {
+      const current = activeIndexRef.current;
+      const next = current + 1 >= videos.length ? 0 : current + 1;
+      alignToIndex(next, next === 0 ? 'auto' : 'smooth');
+    }, AUTO_SCROLL_INTERVAL);
+  }, [alignToIndex, stopAutoScroll, videos.length]);
+
+  const postponeAutoScroll = useCallback(() => {
+    stopAutoScroll();
+    if (resumeTimeoutRef.current) {
+      window.clearTimeout(resumeTimeoutRef.current);
+    }
+    if (videos.length <= 1) return;
+
+    resumeTimeoutRef.current = window.setTimeout(() => {
+      startAutoScroll();
+    }, AUTO_RESUME_DELAY);
+  }, [startAutoScroll, stopAutoScroll, videos.length]);
 
   const nudgeSlider = (direction) => {
-    const slider = sliderRef.current;
-    if (!slider) return;
+    if (!videos.length) return;
+    postponeAutoScroll();
 
-    const firstCard = slider.querySelector(`.${styles.verticalCard}`);
-    const gap = parseFloat(getComputedStyle(slider).columnGap || getComputedStyle(slider).gap || '24');
-    const step = (firstCard ? firstCard.clientWidth : 272) + gap;
+    const current = activeIndexRef.current;
+    const next = wrapIndex(current + direction, videos.length);
+    const wrapsForward = direction > 0 && current === videos.length - 1;
+    const wrapsBackward = direction < 0 && current === 0;
 
-    slider.scrollBy({ left: step * direction, behavior: 'smooth' });
+    alignToIndex(next, wrapsForward || wrapsBackward ? 'auto' : 'smooth');
   };
 
   useEffect(() => {
-    const tiktokVideos = baseVideos.filter((video) => video.type === 'tiktok');
+    const tiktokVideos = videos.filter((video) => video.type === 'tiktok');
     if (!tiktokVideos.length) return;
 
     let isCancelled = false;
@@ -76,19 +137,16 @@ function Music({ texts }) {
     return () => {
       isCancelled = true;
     };
-  }, [baseVideos]);
+  }, [videos]);
 
   useEffect(() => {
     const slider = sliderRef.current;
-    const groupSize = baseVideos.length;
-    if (!slider || groupSize === 0) return;
-
-    const cards = Array.from(slider.querySelectorAll(`.${styles.verticalCard}`));
-    if (!cards.length || cards.length < groupSize * 3) return;
-
-    const getLoopWidth = () => cards[groupSize].offsetLeft - cards[0].offsetLeft;
+    if (!slider || videos.length === 0) return;
 
     const findCenteredCard = () => {
+      const cards = Array.from(slider.querySelectorAll(`.${styles.verticalCard}`));
+      if (!cards.length) return;
+
       const sliderRect = slider.getBoundingClientRect();
       const sliderCenter = sliderRect.left + sliderRect.width / 2;
 
@@ -106,130 +164,75 @@ function Music({ texts }) {
         }
       });
 
-      setActiveRenderIndex(closest);
+      activeIndexRef.current = closest;
+      setActiveIndex(closest);
     };
-
-    let animationFrameId = null;
-    let autoScrollFrameId = null;
-    let currentScroll = slider.scrollLeft;
-    let targetScroll = slider.scrollLeft;
-    let autoPaused = false;
-
-    const middleIndex = groupSize * Math.floor(LOOP_COPIES / 2) + Math.floor(groupSize / 2);
-    const middleCard = cards[middleIndex];
-    if (middleCard) {
-      slider.scrollTo({
-        left: middleCard.offsetLeft - slider.clientWidth / 2 + middleCard.clientWidth / 2,
-        behavior: 'auto',
-      });
-      currentScroll = slider.scrollLeft;
-      targetScroll = slider.scrollLeft;
-      setActiveRenderIndex(middleIndex);
-    }
 
     const handleScroll = () => {
-      const loopWidth = getLoopWidth();
-      if (!loopWidth) return;
-
-      const loopShift = loopWidth * Math.floor(LOOP_COPIES / 2);
-      const safeMin = loopWidth;
-      const safeMax = loopWidth * (LOOP_COPIES - 2);
-
-      if (!isAdjustingRef.current) {
-        if (slider.scrollLeft < safeMin) {
-          isAdjustingRef.current = true;
-          slider.scrollLeft += loopShift;
-          currentScroll = slider.scrollLeft;
-          targetScroll = slider.scrollLeft;
-          requestAnimationFrame(() => {
-            isAdjustingRef.current = false;
-            findCenteredCard();
-          });
-          return;
-        }
-
-        if (slider.scrollLeft > safeMax) {
-          isAdjustingRef.current = true;
-          slider.scrollLeft -= loopShift;
-          currentScroll = slider.scrollLeft;
-          targetScroll = slider.scrollLeft;
-          requestAnimationFrame(() => {
-            isAdjustingRef.current = false;
-            findCenteredCard();
-          });
-          return;
-        }
+      if (scrollTimeoutRef.current) {
+        window.clearTimeout(scrollTimeoutRef.current);
       }
 
+      scrollTimeoutRef.current = window.setTimeout(findCenteredCard, 80);
+    };
+
+    const handlePointerDown = () => {
+      postponeAutoScroll();
+    };
+
+    const handlePointerUp = () => {
+      postponeAutoScroll();
+    };
+
+    const handleMouseEnter = () => {
+      stopAutoScroll();
+    };
+
+    const handleMouseLeave = () => {
+      startAutoScroll();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopAutoScroll();
+        return;
+      }
+      startAutoScroll();
+    };
+
+    const rafId = window.requestAnimationFrame(() => {
+      alignToIndex(activeIndexRef.current, 'auto');
       findCenteredCard();
-    };
+    });
 
-    const animateWheelScroll = () => {
-      currentScroll += (targetScroll - currentScroll) * 0.18;
-      slider.scrollLeft = currentScroll;
-
-      if (Math.abs(targetScroll - currentScroll) > 0.6) {
-        animationFrameId = requestAnimationFrame(animateWheelScroll);
-      } else {
-        currentScroll = targetScroll;
-        slider.scrollLeft = currentScroll;
-        animationFrameId = null;
-      }
-    };
-
-    const handleWheel = (event) => {
-      const wheelDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
-      if (Math.abs(wheelDelta) < 1.5) return;
-
-      event.preventDefault();
-      targetScroll += wheelDelta * 1.12;
-
-      if (!animationFrameId) {
-        animationFrameId = requestAnimationFrame(animateWheelScroll);
-      }
-    };
-
-    const pauseAutoScroll = () => {
-      autoPaused = true;
-    };
-
-    const resumeAutoScroll = () => {
-      autoPaused = false;
-    };
-
-    const animateAutoScroll = () => {
-      if (!autoPaused) {
-        targetScroll += 0.28;
-        if (!animationFrameId) {
-          animationFrameId = requestAnimationFrame(animateWheelScroll);
-        }
-      }
-
-      autoScrollFrameId = requestAnimationFrame(animateAutoScroll);
-    };
-
-    findCenteredCard();
     slider.addEventListener('scroll', handleScroll, { passive: true });
-    slider.addEventListener('wheel', handleWheel, { passive: false });
-    slider.addEventListener('mouseenter', pauseAutoScroll);
-    slider.addEventListener('mouseleave', resumeAutoScroll);
-    slider.addEventListener('touchstart', pauseAutoScroll, { passive: true });
-    slider.addEventListener('touchend', resumeAutoScroll, { passive: true });
-    window.addEventListener('resize', handleScroll);
-    autoScrollFrameId = requestAnimationFrame(animateAutoScroll);
+    slider.addEventListener('pointerdown', handlePointerDown, { passive: true });
+    slider.addEventListener('pointerup', handlePointerUp, { passive: true });
+    slider.addEventListener('mouseenter', handleMouseEnter);
+    slider.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('resize', findCenteredCard);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    startAutoScroll();
 
     return () => {
       slider.removeEventListener('scroll', handleScroll);
-      slider.removeEventListener('wheel', handleWheel);
-      slider.removeEventListener('mouseenter', pauseAutoScroll);
-      slider.removeEventListener('mouseleave', resumeAutoScroll);
-      slider.removeEventListener('touchstart', pauseAutoScroll);
-      slider.removeEventListener('touchend', resumeAutoScroll);
-      window.removeEventListener('resize', handleScroll);
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
-      if (autoScrollFrameId) cancelAnimationFrame(autoScrollFrameId);
+      slider.removeEventListener('pointerdown', handlePointerDown);
+      slider.removeEventListener('pointerup', handlePointerUp);
+      slider.removeEventListener('mouseenter', handleMouseEnter);
+      slider.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('resize', findCenteredCard);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+
+      window.cancelAnimationFrame(rafId);
+      if (scrollTimeoutRef.current) {
+        window.clearTimeout(scrollTimeoutRef.current);
+      }
+      if (resumeTimeoutRef.current) {
+        window.clearTimeout(resumeTimeoutRef.current);
+      }
+      stopAutoScroll();
     };
-  }, [baseVideos, renderedVideos, styles.verticalCard]);
+  }, [alignToIndex, postponeAutoScroll, startAutoScroll, stopAutoScroll, videos.length]);
 
   return (
     <motion.main className={styles.music} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.7 }}>
@@ -241,7 +244,7 @@ function Music({ texts }) {
 
       <div className={styles.sliderContainer}>
         <div className={styles.verticalSlider} ref={sliderRef}>
-          {renderedVideos.map((video, index) => {
+          {videos.map((video, index) => {
             let href = '';
             let imageUrl = null;
 
@@ -258,8 +261,8 @@ function Music({ texts }) {
 
             return (
               <motion.a
-                key={`${video.id}-${index}`}
-                className={`${styles.verticalCard} ${activeRenderIndex === index ? styles.activeCard : ''}`}
+                key={video.id}
+                className={`${styles.verticalCard} ${activeIndex === index ? styles.activeCard : ''}`}
                 href={href}
                 target="_blank"
                 rel="noreferrer noopener"
