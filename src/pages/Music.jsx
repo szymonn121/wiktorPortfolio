@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { SiTiktok } from 'react-icons/si';
@@ -32,7 +32,7 @@ function Music({ texts }) {
   const activeIndexRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
   const [tiktokThumbnails, setTiktokThumbnails] = useState({});
-  const videos = texts.music.videos ?? [];
+  const videos = useMemo(() => [...(texts.music.videos ?? [])].reverse(), [texts.music.videos]);
 
   useEffect(() => {
     activeIndexRef.current = activeIndex;
